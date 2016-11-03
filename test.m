@@ -1,0 +1,16 @@
+img1 = imread('test/lab/cyl_image01.png');
+img2 = imread('test/lab/cyl_image02.png');
+C1 = corner_detector(img1);
+C2 = corner_detector(img2);
+[x1, y1, ~] = anms(C1, 500);
+[x2, y2, ~] = anms(C2, 500);
+descs1 = feat_desc(img1, x1, y1);
+descs2 = feat_desc(img2, x2, y2);
+match = feat_match(descs1, descs2);
+mask = match ~= -1;
+match = match(mask);
+[H, idx] = ransac_est_homography(x1(mask), y1(mask), x2(match), y2(match), 1);
+x1 = x1(mask); y1 = y1(mask); x2 = x2(match); y2 = y2(match);
+inliers = zeros(size(x1, 1), 1);
+inliers(idx) = 1;
+visual_match(img1, img2, x1, y1, x2, y2, inliers);

@@ -9,16 +9,23 @@ function H = est_homography(X,Y,x,y)
 %    H is the homography output 3x3
 %   (X,Y, 1)^T ~ H (x, y, 1)^T
 
-A = zeros(length(x(:))*2,9);
+% A = zeros(length(x(:))*2,9);
+% 
+% for i = 1:length(x(:))
+%  a = [x(i),y(i),1];
+%  b = [0 0 0];
+%  c = [X(i);Y(i)];
+%  d = -c*a;
+%  A((i-1)*2+1:(i-1)*2+2,1:9) = [[a b;b a] d];
+% end
 
-for i = 1:length(x(:)),
- a = [x(i),y(i),1];
- b = [0 0 0];
- c = [X(i);Y(i)];
- d = -c*a;
- A((i-1)*2+1:(i-1)*2+2,1:9) = [[a b;b a] d];
-end
+a = permute([x, y, ones(length(x(:)), 1)], [3 2 1]);
+b = zeros(size(a));
+c = permute([X'; Y'], [1 3 2]);
+d = bsxfun(@times, -c, a);
+A = [[a, b; b, a], d];
+A = reshape(permute(A, [2 1 3]), 9, [])';
 
-[U S V] = svd(A);
+[U, S, V] = svd(A);
 h = V(:,9);
 H = reshape(h,3,3)';

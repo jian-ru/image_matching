@@ -12,7 +12,7 @@ function [ output_args ] = visual_match( img1, img2, x1, y1, x2, y2, inlier)
     figure;
     imshow(img1);
     hold on;
-    scatter(x1_inlier,y1_inlier, 'b.');    
+    scatter(x1_inlier,y1_inlier, 'bo');    
     scatter(x1_outlier,y1_outlier, 'rx');    
     hold off;
 
@@ -20,7 +20,7 @@ function [ output_args ] = visual_match( img1, img2, x1, y1, x2, y2, inlier)
     figure;
     imshow(img2);
     hold on;
-    scatter(x2_inlier,y2_inlier, 'b.');    
+    scatter(x2_inlier,y2_inlier, 'bo');    
     scatter(x2_outlier,y2_outlier, 'rx');    
     hold off;
 end

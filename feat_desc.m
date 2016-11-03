@@ -12,7 +12,7 @@ function [descs] = feat_desc(img, x, y)
     img = double(img);
     
     kernelSize = 5;
-    sigma = 1.0;
+    sigma = 0.8;
     G = fspecial('gaussian', [kernelSize kernelSize], sigma);
     img = conv2(img, G, 'full');
     
@@ -28,4 +28,8 @@ function [descs] = feat_desc(img, x, y)
         permute(y', [1 3 2]));
     descs = img(idx(:));
     descs = reshape(descs, 64, []);
+    M = mean(descs);
+    sigma = std(descs);
+    descs = bsxfun(@minus, descs, M);
+    descs = bsxfun(@rdivide, descs, sigma);
 end

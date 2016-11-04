@@ -7,7 +7,7 @@
 function [x, y, rmax] = anms(cimg, max_pts)
     [nr, nc, ~] = size(cimg);
     [X, Y] = meshgrid(1:nc, 1:nr);
-    threshold = 0.1 * max(cimg(:));
+    threshold = 0.03 * max(cimg(:));
     mask = cimg > threshold;
     C = cimg(mask);
     X = X(mask);

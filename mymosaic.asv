@@ -35,8 +35,8 @@ function [img_mosaic] = mymosaic(img_input)
         C2 = corner_detector(img2);
         [x1, y1, ~] = anms(C1, maxPts);
         [x2, y2, ~] = anms(C2, maxPts);
-        descs1 = feat_desc(img1, x1, y1);
-        descs2 = feat_desc(img2, x2, y2);
+        [descs1, x1, y1] = feat_desc(img1, x1, y1);
+        [descs2, x2, y2] = feat_desc(img2, x2, y2);
         match = feat_match(descs1, descs2);
         mask = match ~= -1;
         match = match(mask);
@@ -67,12 +67,7 @@ function [img_mosaic] = mymosaic(img_input)
     maxCoord = maxCoord + offsets;
     
     % Distance transform blending
-    % The basic idea is that we should use color from img1 in area only
-    % covered by img1, use color from img2 in area only covered by img2,
-    % and in overlapping area, blend them according to the ratio of
-    % distance of the pixel to the center of the two images (i.e. alpha1 =
-    % d1 / (d1 + d2)). That is, if you are closer to the center of img1
-    % than to the center of img2, you should be affected more by img1.
+    % The basic idea is
     canvas = zeros(maxCoord(2), maxCoord(1), 3);
     D = zeros(maxCoord(2), maxCoord(1));
     for i = 1:numImgs
@@ -91,8 +86,7 @@ function [img_mosaic] = mymosaic(img_input)
         [nr, nc, ~] = size(img);
         ex = sx + nc - 1; ey = sy + nr - 1;
         if ex > size(canvas, 2) || ey > size(canvas, 1)
-            padding = [max(ey - size(canvas, 1), 0), ...
-                max(ex - size(canvas, 2), 0)];
+            padding = [ey - size(canvas, 1), ex - size(canvas, 2)];
             canvas = padarray(canvas, padding, 'post');
             D = padarray(D, padding, 'post');
         end

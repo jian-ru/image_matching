@@ -13,14 +13,31 @@
 % [H, idx] = ransac_est_homography(x1, y1, x2, y2, 3);
 % showMatchedFeatures(img1, img2, [x1(idx), y1(idx)], [x2(idx), y2(idx)], 'montage');
 
-baseName = 'test/goldenbridge/goldengate-';
-numImgs = 6;
+clear all;
+
+% baseName = 'test/goldenbridge/goldengate-';
+% numImgs = 6;
+% ext = '.png';
+% baseNum = 0;
+
+% baseName = 'test/test1/';
+% numImgs = 2;
+% ext = '.jpg';
+% baseNum = 0;
+
+% baseName = 'test/lab/cyl_image';
+% numImgs = 18;
+% ext = '.png';
+% baseNum = 1;
+
+baseName = 'test/
+
 for i=1:numImgs
-    num = i - 1;
+    num = i - 1 + baseNum;
     if num < 10
-        imgName = [baseName, '0', num2str(num), '.png'];
+        imgName = [baseName, '0', num2str(num), ext];
     else
-        imgName = [baseName, num2str(num), '.png'];
+        imgName = [baseName, num2str(num), ext];
     end
     
     inputImgs{i} = imread(imgName);

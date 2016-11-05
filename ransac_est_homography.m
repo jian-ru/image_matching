@@ -10,7 +10,7 @@
 % x2, y2 that were found to be inliers
 
 function [H, inlier_ind] = ransac_est_homography(x1, y1, x2, y2, thresh)
-    numIters = 1000;
+    numIters = 2000;
     numMatches = size(x1, 1);
     % 1000 samples of 4 points
     samples = zeros(numIters * 4, 1);

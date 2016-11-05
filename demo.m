@@ -35,15 +35,20 @@ baseNum = 0;
 % ext = '.png';
 % baseNum = 0;
 
-% baseName = 'test/office/office-';
-% numImgs = 4;
-% ext = '.png';
-% baseNum = 0;
-
 % baseName = 'test/yosemite/yosemite';
 % numImgs = 4;
 % ext = '.jpg';
 % baseNum = 1;
+
+% baseName = 'test/hotel/hotel-';
+% numImgs = 8;
+% ext = '.png';
+% baseNum = 0;
+
+% baseName = 'test/yard/yard-';
+% numImgs = 9;
+% ext = '.png';
+% baseNum = 0;
 
 for i=1:numImgs
     num = i - 1 + baseNum;

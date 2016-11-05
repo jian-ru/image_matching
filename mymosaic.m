@@ -3,9 +3,7 @@
 % img_mosaic is the output mosaic
 
 function [img_mosaic] = mymosaic(img_input)
-    grayImgs = img_input;
     numImgs = length(img_input);
-    
     if numImgs <= 0
         img_mosaic = {};
         return;
@@ -14,6 +12,27 @@ function [img_mosaic] = mymosaic(img_input)
         img_mosaic = img_input;
         return;
     end
+    
+    focalLen = 1320; % goldengate
+%     focalLen = 3500; % test1
+%     focalLen = 5000; % lab
+%     focalLen = 1650; % halfdome
+%     focalLen = 1700; % yosemite
+%     focalLen = 1700; % carmel
+%     focalLen = 1650; % hotel
+%     focalLen = 800; % yard
+    
+    for i = 1:numImgs
+        [nr, nc, ~] = size(img_input{i});
+        D = padarray(zeros(nr, nc), [1 1], 1);
+        D = bwdist(D);
+        D = D(2:end-1,2:end-1);
+        Ds{i} = projImgCylinder(D, focalLen);
+        img = double(img_input{i});
+        img = img ./ max(img(:));
+        img_input{i} = projImgCylinder(img, focalLen);
+    end
+    grayImgs = img_input;
     
     for i = 1:numImgs
         if size(grayImgs{i}, 3) == 3
@@ -31,8 +50,8 @@ function [img_mosaic] = mymosaic(img_input)
     for i = 1:numImgs-1
         img1 = grayImgs{i};
         img2 = grayImgs{i+1};
-        C1 = corner_detector(img1);
-        C2 = corner_detector(img2);
+        C1 = corner_detector(img1) .* (Ds{i} > 20.0);
+        C2 = corner_detector(img2) .* (Ds{i+1} > 20.0);
         [x1, y1, ~] = anms(C1, maxPts);
         [x2, y2, ~] = anms(C2, maxPts);
         descs1 = feat_desc(img1, x1, y1);
@@ -44,6 +63,8 @@ function [img_mosaic] = mymosaic(img_input)
         [H, idx] = ransac_est_homography(x1, y1, x2, y2, ransacThreshold);
         Hs{i} = H;
         x1 = x1(idx); y1 = y1(idx); x2 = x2(idx); y2 = y2(idx);
+%         tform = estimateGeometricTransform([x1 y1], [x2 y2], 'similarity');
+%         Hs{i} = tform.T';
         figure; showMatchedFeatures(img1, img2, [x1, y1], [x2, y2], 'montage');
     end
     Hs{numImgs} = eye(3, 3);
@@ -78,12 +99,10 @@ function [img_mosaic] = mymosaic(img_input)
     for i = 1:numImgs
         img = img_input{i};
         H = Hs{i};
+        mask = Ds{i};
+        mask = mask ./ max(mask(:));
         corners{i} = bsxfun(@plus, corners{i}, offsets);
         startXY = max(floor(min(corners{i}, [], 2)), 1);
-        mask = padarray(zeros(size(img(:,:,1))), [1 1], 1);
-        mask = bwdist(mask);
-        mask = mask(2:end-1, 2:end-1);
-        mask = mask ./ max(mask(:));
         T = projective2d(H');
         img = double(imwarp(img, T));
         mask = imwarp(mask, T);
@@ -102,6 +121,6 @@ function [img_mosaic] = mymosaic(img_input)
         D(sy:sy+nr-1, sx:sx+nc-1) = bsxfun(@times, mask, alpha) + ...
             bsxfun(@times, D(sy:sy+nr-1, sx:sx+nc-1), 1.0 - alpha);
     end
-    img_mosaic = uint8(min(canvas, 255));
+    img_mosaic = uint8(min(canvas .* 255, 255));
     figure; imshow(img_mosaic);
 end
